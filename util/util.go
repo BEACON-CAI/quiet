@@ -1,10 +1,13 @@
 package util
 
 import (
+	"crypto/md5"
 	"fmt"
+	"io"
 	"math/rand"
 	"net"
 	"os"
+	"quiet/vars"
 	"strconv"
 	"strings"
 	"time"
@@ -144,3 +147,25 @@ func CheckRoot() {
 		os.Exit(0)
 	}
 }
+
+// md5 function
+func MD5(s string) (m string) {
+	h := md5.New()
+	_, _ = io.WriteString(h, s)
+	return fmt.Sprintf("%x", h.Sum(nil))
+}
+
+func MakeTaskHash(k string) string {
+	hash := MD5(k)
+	return hash
+}
+
+func CheckTaskHash(hash string) bool {
+	_, ok := vars.SuccessHash.Load(hash)
+	return ok
+}
+
+func SetTaskHash(hash string) {
+	vars.SuccessHash.Store(hash, true)
+}
+

@@ -8,6 +8,8 @@ import (
 	"sync"
 
 	"quiet/vars"
+
+	"gopkg.in/cheggaaa/pb.v2"
 )
 
 // Generate port scan task
@@ -29,6 +31,7 @@ func GeneratePSTask(ipList []net.IP, ports []int) ([]map[string]int, int) {
 // Port scan task
 func PortScanTask(taskChan chan map[string]int, wg *sync.WaitGroup) {
 	for task := range taskChan {
+		vars.ProgressBarPS.Increment()
 		for ip, port := range task {
 			if strings.ToLower(vars.PortScanMode) == "syn" {
 				err := SavePSResult(TcpSYN(vars.SrcIP, vars.SrcPort, ip, port))
@@ -43,11 +46,13 @@ func PortScanTask(taskChan chan map[string]int, wg *sync.WaitGroup) {
 }
 
 // Run port scan task
-func RunPSTask(tasks []map[string]int) {
+func RunPSTask(tasks []map[string]int, totalTask int) {
+	vars.ProgressBarPS = pb.StartNew(totalTask)
+	vars.ProgressBarPS.SetTemplate(`Custom template: {{counters . }}`)
 	wg := &sync.WaitGroup{}
 
-	// Create a channel which buffer is vars.threadNum * 2
-	taskChan := make(chan map[string]int, vars.ThreadNum*2)
+	// Create a channel which buffer is vars.threadNum
+	taskChan := make(chan map[string]int, vars.ThreadNum)
 
 	// Create vars.ThreadNum coroutines
 	for i := 0; i < vars.ThreadNum; i++ {
@@ -93,7 +98,7 @@ func SavePSResult(ip string, port int, err error) error {
 
 // Print port scan result
 func PrintPSResult(result *sync.Map) {
-	fmt.Println("Port scan completed!")
+	fmt.Println("\nPort scan completed!")
 	result.Range(func(key, value interface{}) bool {
 		fmt.Printf("%v : ", key)
 		fmt.Printf("%v\n", value)

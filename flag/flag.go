@@ -2,6 +2,7 @@ package flag
 
 import (
 	"quiet/actions"
+	"quiet/crackpwd"
 
 	"github.com/urfave/cli/v2"
 )
@@ -89,3 +90,50 @@ var ICMPScanCom = &cli.Command{
 		},
 	},
 }
+
+var PasswordCrack = &cli.Command{
+	Name:        "PasswordCrack",
+	Usage:       "Password crack",
+	Aliases:     []string{"crack", "pc"},
+	Description: "Password crack",
+	Action:      crackpwd.PasswordCrack,
+	Flags: []cli.Flag{
+		&cli.StringFlag{
+			Name:    "ip_list",
+			Aliases: []string{"ip", "i"},
+			Value:   "ip_list.txt",
+			Usage:   "ip list",
+		},
+		&cli.StringFlag{
+			Name:    "user_dict",
+			Aliases: []string{"ud", "u","user"},
+			Value:   "user.txt",
+			Usage:   "user dict",
+		},
+		&cli.StringFlag{
+			Name:    "pass_dict",
+			Aliases: []string{"pd", "p","password"},
+			Value:   "paswd.txt",
+			Usage:   "password dict",
+		},
+		&cli.StringFlag{
+			Name:    "outfile",
+			Aliases: []string{"of", "o"},
+			Value:   "password_result.txt",
+			Usage:   "password result",
+		},
+		&cli.IntFlag{
+			Name:    "timeout",
+			Aliases: []string{"t"},
+			Value:   2,
+			Usage:   "timeout",
+		},
+		&cli.IntFlag{
+			Name:    "concurrency",
+			Aliases: []string{"c"},
+			Value:   1000,
+			Usage:   "concurrency",
+		},
+	},
+}
+

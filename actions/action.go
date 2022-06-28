@@ -63,11 +63,13 @@ func PortScan(ctx *cli.Context) error {
 		vars.SrcPort = p
 	}
 
-	tasks, n := scanner.GeneratePSTask(ips, vars.Port)
+	tasks, totalTask := scanner.GeneratePSTask(ips, vars.Port)
 	// _ = n
 	fmt.Println("Port scanning...")
-	fmt.Printf("Total tasks: %v | Port scan mode: %s | Timeout: %d seconds\n", n, vars.ModeFlag, vars.Timeout)
-	scanner.RunPSTask(tasks)
+	fmt.Printf("Total tasks: %v | Port scan mode: %s | Timeout: %d seconds\n", totalTask, vars.ModeFlag, vars.Timeout)
+	// run
+	scanner.RunPSTask(tasks, totalTask)
+	// result
 	scanner.PrintPSResult(vars.PortScanResult)
 	return err
 }

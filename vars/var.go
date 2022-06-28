@@ -2,14 +2,32 @@ package vars
 
 import (
 	"net"
+	"strings"
 	"sync"
+	"time"
+
+	"github.com/patrickmn/go-cache"
+	"gopkg.in/cheggaaa/pb.v2"
 )
 
+// normal
 var (
 	Timeout   = 2
 	ThreadNum = 1000
+	StartTime time.Time
 )
 
+// progress bar
+var (
+	// port scan
+	ProgressBarPS *pb.ProgressBar
+	// when cracking password ,check the port is open
+	ProgressBarPC *pb.ProgressBar
+	// cracking password
+	ProgressBarCP *pb.ProgressBar
+)
+
+// port scan or icmp scan
 var (
 	PortScanResult *sync.Map
 	SrcIP          net.IP
@@ -23,10 +41,47 @@ var (
 	UseToTestLocalIP = "114.114.114.114"
 )
 
+// port scan
+func init() {
+	PortScanResult = &sync.Map{}
+}
+
+// icmp scan
 var (
 	ICMPHost = []string{}
 )
 
+// password cracking
+var (
+	PortNames = map[int]string{
+		22:    "SSH",
+		3306:  "MYSQL",
+		6379:  "REDIS",
+		1433:  "MSSQL",
+		5432:  "POSTGRESQL",
+		27017: "MONGODB",
+	}
+
+	PCIPList = "ip_list.txt"
+	UserDict = "user.txt"
+	PassDict = "paswd.txt"
+
+	// save result in a cache
+	CacheService *cache.Cache
+	ResultFile   = "password_result.txt"
+
+	// Flag whether a particular user of a particular service has been cracked successfully.
+	// If so, no further attempts are made to crack the user
+	SuccessHash sync.Map
+
+	SupportProtocols map[string]bool
+)
+
 func init() {
-	PortScanResult = &sync.Map{}
+	CacheService = cache.New(cache.NoExpiration, cache.DefaultExpiration)
+
+	SupportProtocols = make(map[string]bool)
+	for _, proto := range PortNames {
+		SupportProtocols[strings.ToUpper(proto)] = true
+	}
 }

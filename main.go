@@ -13,9 +13,9 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Name = "quiet"
-	app.Version = "1.0.1"
+	app.Version = "2.0.1"
 	app.Usage = "port/icmp scanner"
-	app.Commands = []*cli.Command{flag.PortScanCom, flag.ICMPScanCom}
+	app.Commands = []*cli.Command{flag.PortScanCom, flag.ICMPScanCom,flag.PasswordCrack}
 
 	banner := `
              _      _
